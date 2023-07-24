@@ -14,4 +14,4 @@ docker run --rm -p 5432:5432 -e "POSTGRES_PASSWORD=postgres" --name pg postgres:
 docker exec -it -u postgres pg psql
 ```
 
-## Tutorial by Jeremy Chone https://www.youtube.com/watch?v=VIig9IcQ-w8
+Tutorial by Jeremy Chone https://www.youtube.com/watch?v=VIig9IcQ-w8

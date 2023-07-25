@@ -1,11 +1,11 @@
 use super::db::Db;
 use crate::model;
-use sqlb::HasFields;
-use sqlb::Raw;
 use crate::security::UserCtx;
+use serde::{Serialize, Deserialize};
+use sqlb::{HasFields, Raw};
 
 // region: Todo Types
-#[derive(sqlx::FromRow, Debug, Clone)]
+#[derive(sqlx::FromRow, Debug, Clone, Serialize, Deserialize)]
 pub struct Todo {
     pub id: i64,
     pub cid: i64, // creator id
@@ -19,7 +19,7 @@ pub struct TodoPatch {
     pub status: Option<TodoStatus>,
 }
 
-#[derive(sqlx::Type, Debug, Clone, PartialEq, Eq)]
+#[derive(sqlx::Type, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[sqlx(type_name = "todo_status_enum")]
 #[sqlx(rename_all = "lowercase")]
 pub enum TodoStatus {

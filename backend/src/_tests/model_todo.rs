@@ -10,7 +10,7 @@ use super::TodoMac;
 async fn model_todo_create() -> Result<(), Box<dyn std::error::Error>> {
     // -- FIXTURE
     let db = init_db().await?;
-    let utx = utx_from_token("123").await?;
+    let utx = utx_from_token(&db, "123").await?;
     let data_fx = TodoPatch {
         title: Some("test - model_todo_create 1".to_string()),
         ..Default::default()
@@ -31,7 +31,7 @@ async fn model_todo_create() -> Result<(), Box<dyn std::error::Error>> {
 async fn model_todo_get_ok() -> Result<(), Box<dyn std::error::Error>> {
     // -- FIXTURE
     let db = init_db().await?;
-    let utx = utx_from_token("123").await?;
+    let utx = utx_from_token(&db, "123").await?;
 
     // -- ACTION
     let todo = TodoMac::get(&db, &utx, 100).await?;
@@ -48,7 +48,7 @@ async fn model_todo_get_ok() -> Result<(), Box<dyn std::error::Error>> {
 async fn model_todo_get_wrong_id() -> Result<(), Box<dyn std::error::Error>> {
     // -- FIXTURE
     let db = init_db().await?;
-    let utx = utx_from_token("123").await?;
+    let utx = utx_from_token(&db, "123").await?;
 
     // -- ACTION
     let result = TodoMac::get(&db, &utx, 999).await;
@@ -70,7 +70,7 @@ async fn model_todo_get_wrong_id() -> Result<(), Box<dyn std::error::Error>> {
 async fn model_todo_update_ok() -> Result<(), Box<dyn std::error::Error>> {
     // -- FIXTURE
     let db = init_db().await?;
-    let utx = utx_from_token("123").await?;
+    let utx = utx_from_token(&db, "123").await?;
     let data_fx = TodoPatch {
         title: Some("test - model_todo_create 1".to_string()),
         ..Default::default()
@@ -96,7 +96,7 @@ async fn model_todo_update_ok() -> Result<(), Box<dyn std::error::Error>> {
 async fn model_todo_list() -> Result<(), Box<dyn std::error::Error>> {
     // -- FIXTURE
     let db = init_db().await?;
-    let utx = utx_from_token("123").await?;
+    let utx = utx_from_token(&db, "123").await?;
 
     // -- ACTION
     let todos = TodoMac::list(&db, &utx).await?;
@@ -119,7 +119,7 @@ async fn model_todo_list() -> Result<(), Box<dyn std::error::Error>> {
 async fn model_todo_delete_simple() -> Result<(), Box<dyn std::error::Error>> {
     // -- FIXTURE
     let db = init_db().await?;
-    let utx = utx_from_token("123").await?;
+    let utx = utx_from_token(&db, "123").await?;
 
     // -- ACTION
     let todo = TodoMac::delete(&db, &utx, 100).await?;

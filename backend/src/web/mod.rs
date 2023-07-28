@@ -1,6 +1,9 @@
-use warp::Filter;
+use serde_json::json;
+use warp::{Filter, Reply, Rejection};
 use crate::{model::{Db, self}, security};
-use std::{sync::Arc, path::Path};
+use std::{sync::Arc, path::Path, convert};
+use std::convert::Infallible;
+
 
 mod filter_auth;
 mod filter_utils;
@@ -20,12 +23,30 @@ pub async fn start_web(web_folder: &str, web_port: u16, db: Arc<Db>) -> Result<(
     let static_site = content.or(root_index);
 
     // Combine all routes
-    let routes = static_site;
+    let routes = static_site.recover(handle_rejection);
 
     println!("Start 127.0.0.1:{} at {}", web_port, web_folder);
     warp::serve(routes).run(([127, 0, 0, 1], web_port)).await;
 
     Ok(())
+}
+
+async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> {
+    // Print to server side
+    println!("ERROR - {:?}", err);
+
+    // TODO - Call log API for capture and store
+
+    // Build user message
+    let user_message = match err.find::<WebErrorMessage>() {
+        Some(err) => err.typ.to_string(),
+        None => "Unknown".to_string(),
+    };
+
+    let result = json!({ "errorMessage": user_message });
+    let result = warp::reply::json(&result);
+
+    Ok(warp::reply::with_status(result, warp::http::StatusCode::BAD_REQUEST))
 }
 
 #[derive(thiserror::Error, Debug)]

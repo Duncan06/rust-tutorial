@@ -3,15 +3,15 @@ use super::todo_rest_filters;
 use anyhow::{Result, Context};
 use serde::Deserialize;
 use serde_json::{from_str, Value, from_value};
-use warp::hyper::{Response, body::Bytes};
-use crate::model::{init_db, Todo, TodoStatus};
+use warp::{hyper::{Response, body::Bytes}, Filter};
+use crate::{model::{init_db, Todo, TodoStatus}, web::handle_rejection};
 
 #[tokio::test]
 async fn web_todo_list() -> Result<()> {
     // -- FIXTURE
     let db = init_db().await?;
     let db = Arc::new(db);
-    let todo_apis = todo_rest_filters("api", db.clone());
+    let todo_apis = todo_rest_filters("api", db.clone()).recover(handle_rejection);
 
     // -- ACTION 
     let resp = warp::test::request()

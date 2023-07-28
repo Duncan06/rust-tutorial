@@ -20,7 +20,36 @@ pub fn todo_rest_filters<>(
         .and(common.clone())
         .and_then(todo_list);
 
-    list
+    // GET todo 'GET /todos/100'
+    let get = todos_path
+        .and(warp::get())
+        .and(common.clone())
+        .and(warp::path::param())
+        .and_then(todo_get);
+
+    // CREATE todo 'POST /todos with body TodoPatch'
+    let create = todos_path
+        .and(warp::post())
+        .and(common.clone())
+        .and(warp::body::json())
+        .and_then(todo_create);
+
+    // UPDATE todo 'PATCH /todos/100 with body TodoPatch'
+    let update = todos_path
+        .and(warp::patch())
+        .and(common.clone())
+        .and(warp::path::param())
+        .and(warp::body::json())
+        .and_then(todo_update);
+
+    // DELETE todo 'DELETE /todos/100'
+    let delete = todos_path
+        .and(warp::delete())
+        .and(common.clone())
+        .and(warp::path::param())
+        .and_then(todo_delete);
+
+    list.or(get).or(create).or(update).or(delete)
 }
 
 async fn todo_list(db: Arc<Db>, utx: UserCtx) -> Result<Json, warp::Rejection> {

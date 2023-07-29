@@ -53,6 +53,11 @@ class TodoMvc extends BaseHTMLElement {  // extends HTMLElement
             todoItem.data = data; // data will be frozen
         }
     }
+
+    @onHub('dataHub', 'Todo', 'create')
+    onTodoCreate(data: Todo) {
+        this.refresh();
+    }
     // #endregion --- Data Events
 }
 
@@ -67,8 +72,21 @@ class TodoInput extends BaseHTMLElement { // extends HTMLElement
         this.#inputEl = getChild(htmlContent, 'input');
 
         this.append(htmlContent);
-
     }
+
+    // #region --- UI Events
+    @onEvent('keyup', 'input')
+    onInputKeyUp(evt: KeyboardEvent) {
+        if (evt.key == "Enter") {
+            // get value from UI
+            const title = this.#inputEl.value;
+            // send create to server
+            todoMco.create({ title });
+            // don't wait, reset value input
+            this.#inputEl.value = '';
+        }
+    }
+    // #endregion --- UI Events
 }
 
 // todo-input tag

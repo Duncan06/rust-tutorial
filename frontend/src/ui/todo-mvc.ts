@@ -1,4 +1,4 @@
-import { BaseHTMLElement, customElement, getChild, getChildren, html } from 'dom-native';
+import { BaseHTMLElement, OnEvent, customElement, first, getChild, getChildren, html, onEvent, onHub } from 'dom-native';
 import { Todo, todoMco } from 'src/model/todo-mco';
 
 @customElement("todo-mvc")
@@ -31,8 +31,29 @@ class TodoMvc extends BaseHTMLElement {  // extends HTMLElement
 
         this.#todoListEl.innerHTML = '';
         this.#todoListEl.append(htmlContent);
-
     }
+
+    // #region --- UI Events
+    @onEvent('pointerup', 'c-check')
+    onCheckTodo(evt: PointerEvent & OnEvent) {
+        const todoItem = evt.selectTarget.closest("todo-item")!;
+        const status = todoItem.data.status == 'Open' ? 'Close' : 'Open';
+        // update to server
+        todoMco.update(todoItem.data.id, { status });
+    }
+    // #endregion --- UI Events
+
+    // #region --- Data Events
+    @onHub('dataHub', 'Todo', 'update')
+    onTodoUpdate(data: Todo) {
+        // find the todo in the UI
+        const todoItem = first(this, `todo-item.Todo-${data.id}`) as TodoItem | undefined;
+        // if found, update it.
+        if (todoItem) {
+            todoItem.data = data; // data will be frozen
+        }
+    }
+    // #endregion --- Data Events
 }
 
 @customElement("todo-input")
